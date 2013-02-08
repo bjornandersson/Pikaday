@@ -130,7 +130,7 @@
         setDefaultDate: false,
 
         // first day of week (0: Sunday, 1: Monday etc)
-        firstDay: 0,
+        firstDay: 1,
 
         // the minimum/earliest date that can be selected
         minDate: null,
@@ -259,15 +259,15 @@
             next = false;
         }
 
-        html += '<button class="pika-prev' + (prev ? '' : ' is-disabled') + '" type="button">Previous Month</button>';
-        html += '<button class="pika-next' + (next ? '' : ' is-disabled') + '" type="button">Next Month</button>';
+        html += '<button class="pika-prev' + (prev ? '' : ' is-disabled') + '" type="button">\u2039</button>';
+        html += '<button class="pika-next' + (next ? '' : ' is-disabled') + '" type="button">\u203A</button>';
 
         return html += '</div>';
     },
 
     renderTable = function(opts, data)
     {
-        return '<table cellpadding="0" cellspacing="0" class="pika-table">' + renderHead(opts) + renderBody(data) + '</table>';
+        return '<div class="table-wrapper"><table cellpadding="0" cellspacing="0" class="pika-table">' + renderHead(opts) + renderBody(data) + '</table></div>';
     };
 
 
@@ -787,15 +787,34 @@
 
 })(window, window.document);
 
-$(window).scroll(function() {
-    picker.position();
+$("fieldset > em").on("click", function(e) {
+    $(this).prev().data("pikaday").show();
+ });
+
+$("input[data-form-type=date]").each(function(i) {
+    
+    var picker = new Pikaday({
+        field: $("input[data-form-type=date]")[i],
+        i18n: {
+            months        : ['Januari','Februari','Mars','April','Maj','Juni','Juli','Augusti','September','Oktober','November','December'],
+            weekdays      : ['Söndag','Måndag','Tisdag','Onsdag','Torsdag','Fredag','Lördag'],
+            weekdaysShort : ['Sö','Må','Ti','On','To','Fr','Lö']
+        },
+        onSelect: function(event) {
+            var d = new Date(event),
+                formattedDate = "";
+
+            formattedDate = d.getFullYear() + "-";
+            formattedDate += (d.getMonth()+1 < 10 ? ("0" + (d.getMonth()+1)) : (d.getMonth()+1)) + "-";
+            formattedDate += (d.getDate() < 10 ? "0" + d.getDate() : d.getDate());
+            
+            $(this._o.field).val(formattedDate);
+        }
+    });
+
+    $(this).data("pikaday", picker);
+    
 });
 
-var picker = new Pikaday({
-    field: $("input[data-input-type=date]")[0]
-});
-
-
-picker.position();
 
 
